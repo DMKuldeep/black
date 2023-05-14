@@ -8,27 +8,29 @@ function App() {
 
   function deserializeData(data) {
     const value = [];
-    data.map((showArts) => {
+    data && data.length && data.map((showArts) => {
       value.push(parseInt(showArts.intensity));
     });
-    if (value && value.length) {
-      return value;
-    }
+    return value;
   }
 
   useEffect(() => {
-    axios.get("http://localhost:5000/").then((data) => {
-      setState({
-        ...state,
-        intensity: {
-          data: deserializeData(data.data.showArt),
-        },
-      });
-      console.log("state :>> ", state);
-      deserializeData(data.data.showArt);
-      console.log("data :>> ", data);
+    axios.get("http://localhost:4000/").then((data) => {
+      setallDb(data.data)
+
     });
   }, []);
+
+  useEffect(() => {
+    console.log('alldb', alldb)
+    setState({
+      ...state,
+      intensity: [
+        { data: deserializeData(alldb.showArt) }
+      ],
+    });
+    console.log('state', state);
+  }, [alldb]);
 
   const [state, setState] = useState({
     options: {
@@ -43,8 +45,8 @@ function App() {
     intensity: [
       // intensity[0].data
       {
-        name: "constant intensity",
-        data: null,
+        name: "Intensity",
+        data: [0, 0, 0, 0, 0, 0],
       },
     ],
     series: [
@@ -61,18 +63,15 @@ function App() {
         <b>Dashboard Visualization</b>
       </h1>
       <div className="container-fluid">
+      <div className="row"></div>
         <div className="row">
           <div className="col-md-4">
-            {state.intensity && state.intensity.length ? (
-              <Chart
-                options={state.options}
-                series={state.intensity}
-                type="bar"
-                width="420"
-              />
-            ) : (
-              "loading...."
-            )}
+            <Chart
+              options={state.options}
+              series={state.intensity}
+              type="bar"
+              width="420"
+            />
           </div>
           <div className="col-md-4">
             <Chart
