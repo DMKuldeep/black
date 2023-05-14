@@ -8,27 +8,58 @@ function App() {
 
   function deserializeData(data) {
     const value = [];
-    data.map((showArts) => {
-      value.push(parseInt(showArts.intensity));
-    });
-    if (value && value.length) {
-      return value;
-    }
+    data &&
+      data.length &&
+      data.map((showArts) => {
+        value.push(parseInt(showArts.intensity));
+      });
+    return value;
+  }
+  function deserializeDataLikelihood(data) {
+    const value = [];
+    data &&
+      data.length &&
+      data.map((showArts) => {
+        value.push(parseInt(showArts.likelihood));
+      });
+    return value;
+  }
+  function deserializeDataRelevance(data) {
+    const value = [];
+    data &&
+      data.length &&
+      data.map((showArts) => {
+        value.push(parseInt(showArts.relevance));
+      });
+    return value;
+  }
+  function deserializeDataCountry(data) {
+    const value = [];
+    data &&
+      data.length &&
+      data.map((showArts) => {
+        value.push(showArts.source);
+      });
+    return value;
   }
 
   useEffect(() => {
     axios.get("http://localhost:5000/").then((data) => {
-      setState({
-        ...state,
-        intensity: {
-          data: deserializeData(data.data.showArt),
-        },
-      });
-      console.log("state :>> ", state);
-      deserializeData(data.data.showArt);
-      console.log("data :>> ", data);
+      setallDb(data.data);
     });
   }, []);
+
+  useEffect(() => {
+    console.log("alldb", alldb);
+    setState({
+      ...state,
+      intensity: [{ data: deserializeData(alldb.showArt) }],
+      likelihood: [{ data: deserializeDataLikelihood(alldb.showArt) }],
+      relevance: [{ data: deserializeDataRelevance(alldb.showArt) }],
+      xaxis: [{ categories: deserializeDataCountry(alldb.showArt) }],
+    });
+    console.log("state", state);
+  }, [alldb]);
 
   const [state, setState] = useState({
     options: {
@@ -37,20 +68,27 @@ function App() {
         id: "basic-bar",
       },
       xaxis: {
-        categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999],
+        categories: [1991, 1992, 1993, 1994, 1995, 1997],
       },
     },
     intensity: [
       // intensity[0].data
       {
-        name: "constant intensity",
-        data: null,
+        name: "Intensity",
+        data: [0, 0, 0, 0, 0, 0],
       },
     ],
-    series: [
+    likelihood: [
+      // intensity[0].data
       {
-        name: "constant intensity",
-        data: [30, 40, 45, 50, 49, 60, 70, 91],
+        name: "likelihood",
+        data: [0, 0, 0, 0, 0, 0],
+      },
+    ],
+    relevance: [
+      {
+        name: "relevance",
+        data: [0, 0, 0, 0, 0, 0],
       },
     ],
   });
@@ -62,39 +100,39 @@ function App() {
       </h1>
       <div className="container-fluid">
         <div className="row">
-          <div className="col-md-4">
-            {state.intensity && state.intensity.length ? (
-              <Chart
-                options={state.options}
-                series={state.intensity}
-                type="bar"
-                width="420"
-              />
-            ) : (
-              "loading...."
-            )}
-          </div>
-          <div className="col-md-4">
+          <div className="col-md-6">
+            <h4>Intensity Data</h4>
             <Chart
               options={state.options}
-              series={state.series}
-              type="scatter"
-              width="420"
+              series={state.intensity}
+              type="bar"
+              width="100%"
             />
           </div>
-          <div className="col-md-4">
+          <div className="col-md-6">
+          <h4>likelihood Data</h4>
             <Chart
               options={state.options}
-              series={state.series}
-              type="line"
-              width="420"
+              series={state.likelihood}
+              type="scatter"
+              width="100%"
+            />
+          </div>
+          <br></br>
+          <div className="col-md-6">
+          <h4>Relevance Data</h4>
+            <Chart
+              options={state.options}
+              series={state.relevance}
+              type="radar"
+              width="100%"
             />
           </div>
         </div>
       </div>
-      <div className="container-fluid">
+      {/* <div className="container-fluid">
         <div className="row">
-          <div className="col-md-4">
+          <div className="col-md-12">
             <Chart
               options={state.options}
               series={state.series}
@@ -102,7 +140,7 @@ function App() {
               width="420"
             />
           </div>
-          <div className="col-md-4">
+          <div className="col-md-12">
             <Chart
               options={state.options}
               series={state.series}
@@ -110,7 +148,7 @@ function App() {
               width="420"
             />
           </div>
-          <div className="col-md-4">
+          <div className="col-md-12">
             <Chart
               options={state.options}
               series={state.series}
@@ -119,7 +157,7 @@ function App() {
             />
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }
